@@ -1,39 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FTCF Mobile Banking</title>
-<link
-href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-rel="stylesheet">
-<style>
-:root {
---primary-gradient: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
---bg-color: #f3f4f6; --card-bg: #ffffff; --text-main: #111827;
---text-sub: #6b7280; --success: #059669; --danger: #dc2626; --border: #e5e7eb;
-}
-[data-theme="dark"] {
---bg-color: #0f172a; --card-bg: #1e293b; --text-main: #f8f9fa;
---text-sub: #94a3b8; --border: #334155;
-}
-body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color:
-var(--text-main); margin: 0; padding-bottom: 30px; transition: 0.3s; }
-/* Bank App Style Header */
-header {
-background: var(--primary-gradient);
-color: white;
-padding: 30px 20px;
-border-bottom-left-radius: 30px;
-border-bottom-right-radius: 30px;
-text-align: center;
-box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-position: relative;
-}
-.theme-btn { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2);
-border: none; padding: 5px 12px; border-radius: 15px; color: white; font-size: 0.7rem; cursor:
-pointer; backdrop-filter: blur(5px); }
-.date-display { font-size: 0.85rem; opacity: 0.9; margin-top: 5px; }
-.instruction-box {
-background: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px;
-margin: 15px auto; border-radius: 8px; font-size: 0.85rem; color: #92400e;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTCF Premium Banking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f3f4f6; }
+        .bank-header { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="pb-10">
+
+    <!-- Header & Balance Card -->
+    <header class="bank-header p-8 pb-20 rounded-b-[40px] text-white shadow-xl relative">
+        <h1 class="text-center font-bold text-lg">FTCF Portal</h1>
+        
+        <!-- Balance Card -->
+        <div class="glass-card mt-6 p-6 rounded-3xl text-slate-800 shadow-2xl border border-white/20">
+            <p class="text-xs text-slate-500 uppercase tracking-widest">Total Collection</p>
+            <h2 id="total-balance" class="text-3xl font-bold mt-1">Rs. 0</h2>
+        </div>
+    </header>
+
+    <!-- Quick Actions -->
+    <div class="grid grid-cols-4 gap-4 px-6 -mt-10">
+        <div class="bg-white p-4 rounded-2xl shadow-sm text-center font-bold text-blue-700">💸</div>
+        <div class="bg-white p-4 rounded-2xl shadow-sm text-center font-bold text-blue-700">📊</div>
+        <div class="bg-white p-4 rounded-2xl shadow-sm text-center font-bold text-blue-700">📜</div>
+        <div class="bg-white p-4 rounded-2xl shadow-sm text-center font-bold text-blue-700">💬</div>
+    </div>
+
+    <!-- Alert Box -->
+    <div class="px-6 mt-6">
+        <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg text-amber-800 text-sm">
+            <strong>Alert:</strong> System maintenance chal raha hai, 10 August tak kuch features band rahen ge.
+        </div>
+    </div>
+
+    <!-- Member Search -->
+    <div class="px-6 mt-6">
+        <input type="text" id="searchInput" placeholder="Search members..." 
+               class="w-full p-4 rounded-2xl shadow-sm border border-gray-200 outline-none">
+    </div>
+
+    <div id="member-list" class="px-6 mt-4 space-y-3">
+        <!-- Members load hon ge -->
+    </div>
+
+    <script>
+        // Apni Sheet ID yahan rakhein
+        const SHEET_ID = "1hUEigyVt9FcLdeT-2G44mcUMo-r3gSb7AN0XcXilMVw";
+        const BASE_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
+        async function fetchData() {
+            try {
+                const res = await fetch(`${BASE_URL}&range=A2:E100`);
+                const txt = await res.text();
+                const json = JSON.parse(txt.substring(47).slice(0, -2));
+                render(json.table.rows);
+            } catch(e) { console.error(e); }
+        }
+
+        function render(rows) {
+            const list = document.getElementById('member-list');
+            let total = 0;
+            list.innerHTML = '';
+            rows.forEach(row => {
+                const name = row.c[0]?.v || "N/A";
+                const amount = row.c[1]?.v || 0;
+                if(row.c[2]?.v === 'PAID') total += amount;
+                
+                list.innerHTML += `
+                    <div class="bg-white p-4 rounded-2xl shadow-sm flex justify-between items-center">
+                        <span class="font-bold text-slate-700">${name}</span>
+                        <span class="font-bold text-blue-600">Rs. ${amount}</span>
+                    </div>`;
+            });
+            document.getElementById('total-balance').innerText = `Rs. ${total.toLocaleString()}`;
+        }
+        fetchData();
+    </script>
+</body>
+</html>
