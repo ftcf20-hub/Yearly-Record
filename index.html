@@ -1,84 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FTCF Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
-        .banking-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
-    </style>
-</head>
-<body class="pb-10">
+<script>
+    // Aapki Sheet ka Public URL (jo aapne diya tha)
+    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6wLoB92RkkkAwO_IC6Bx-8Si5lYfpMpdtRo_e_9RB1DnceQ4aG-5_Cs9QWENrY_ZP9L7MF6psgGwD/pub?output=csv";
 
-    <header class="banking-gradient text-white p-6 rounded-b-[2.5rem] shadow-2xl">
-        <h1 class="text-xl font-bold text-center">Family Trust & Care Foundation</h1>
-        <p class="text-xs text-center opacity-80 mt-2 italic">"Amanat me khyanat nhi, Behtreen Nizam he Asal Kamyabi Hai"</p>
-        <div class="mt-4 bg-white/10 p-2 rounded-xl text-center">
-            <span class="text-sm font-semibold tracking-widest">YEARLY REPORT 2026</span>
-        </div>
-    </header>
+    async function loadData() {
+        try {
+            const response = await fetch(SHEET_URL);
+            const data = await response.text();
+            
+            // CSV data ko rows mein split karna
+            const rows = data.split('\n').filter(row => row.trim() !== "");
+            const list = document.getElementById('monthly-list');
+            list.innerHTML = '';
+            
+            let totalBal = 0, totalExp = 0;
 
-    <div class="grid grid-cols-2 gap-4 px-4 -mt-6">
-        <div class="bg-white p-5 rounded-2xl shadow-lg border-b-4 border-blue-600">
-            <p class="text-[9px] font-bold text-slate-400 uppercase">Total Balance</p>
-            <h3 id="total-balance" class="text-lg font-bold text-slate-800">Rs. 0</h3>
-        </div>
-        <div class="bg-white p-5 rounded-2xl shadow-lg border-b-4 border-red-500">
-            <p class="text-[9px] font-bold text-slate-400 uppercase">Total Expenses</p>
-            <h3 id="total-expenses" class="text-lg font-bold text-red-600">Rs. 0</h3>
-        </div>
-    </div>
+            // Pehli row (Headers) ko skip kar rahe hain
+            for(let i = 1; i < rows.length; i++) {
+                const cols = rows[i].split(',');
+                if(cols.length >= 3) {
+                    const month = cols[0];
+                    const bal = parseFloat(cols[1]) || 0;
+                    const exp = parseFloat(cols[2]) || 0;
+                    
+                    totalBal += bal;
+                    totalExp += exp;
 
-    <div class="px-4 mt-8">
-        <h2 class="text-lg font-bold text-slate-800 mb-4">Monthly Overview</h2>
-        <div id="monthly-list" class="space-y-3">
-            <p class="text-center text-gray-400 text-sm">Loading...</p>
-        </div>
-    </div>
-
-    <script>
-        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6wLoB92RkkkAwO_IC6Bx-8Si5lYfpMpdtRo_e_9RB1DnceQ4aG-5_Cs9QWENrY_ZP9L7MF6psgGwD/pub?output=csv";
-
-        async function loadCSV() {
-            try {
-                const response = await fetch(CSV_URL);
-                const data = await response.text();
-                const rows = data.split('\n').slice(1); // Pehli row (headers) skip ki
-                
-                const list = document.getElementById('monthly-list');
-                list.innerHTML = '';
-                let totalBal = 0, totalExp = 0;
-
-                rows.forEach(row => {
-                    const cols = row.split(',');
-                    if (cols.length >= 3) {
-                        const month = cols[0];
-                        const bal = parseFloat(cols[1]) || 0;
-                        const exp = parseFloat(cols[2]) || 0;
-                        
-                        totalBal += bal;
-                        totalExp += exp;
-
-                        list.innerHTML += `
-                            <div class="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center border border-slate-100">
-                                <span class="font-bold text-slate-700">${month}</span>
-                                <div class="text-right">
-                                    <p class="text-[10px] text-blue-600 font-bold">Bal: ${bal.toLocaleString()}</p>
-                                    <p class="text-[10px] text-red-500 font-bold">Exp: ${exp.toLocaleString()}</p>
-                                </div>
-                            </div>`;
-                    }
-                });
-                document.getElementById('total-balance').innerText = `Rs. ${totalBal.toLocaleString()}`;
-                document.getElementById('total-expenses').innerText = `Rs. ${totalExp.toLocaleString()}`;
-            } catch (e) {
-                document.getElementById('monthly-list').innerHTML = "Data load nahi ho saka.";
+                    list.innerHTML += `
+                        <div class="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center border border-slate-100">
+                            <span class="font-bold text-slate-700">${month}</span>
+                            <div class="text-right">
+                                <p class="text-[10px] text-blue-600 font-bold">Bal: ${bal.toLocaleString()}</p>
+                                <p class="text-[10px] text-red-500 font-bold">Exp: ${exp.toLocaleString()}</p>
+                            </div>
+                        </div>`;
+                }
             }
+            document.getElementById('total-balance').innerText = `Rs. ${totalBal.toLocaleString()}`;
+            document.getElementById('total-expenses').innerText = `Rs. ${totalExp.toLocaleString()}`;
+        } catch(e) {
+            console.log("Error:", e);
+            document.getElementById('monthly-list').innerHTML = "Data fetch nahi ho saka. Connection check karein.";
         }
-        loadCSV();
-    </script>
-</body>
-</html>
+    }
+    loadData();
+</script>
