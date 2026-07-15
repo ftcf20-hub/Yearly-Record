@@ -35,7 +35,7 @@
     <div class="px-4 mt-8">
         <h2 class="text-lg font-bold text-slate-800 mb-4">Monthly Overview</h2>
         <div id="monthly-list" class="space-y-3">
-            <p class="text-center text-gray-400 text-sm">Loading...</p>
+            <p class="text-center text-gray-400 text-sm">Loading data...</p>
         </div>
     </div>
 
@@ -44,40 +44,44 @@
     </div>
 
     <script>
-        const SHEET_ID = "2PACX-1vQ6wLoB92RkkkAwO_IC6Bx-8Si5lYfpMpdtRo_e_9RB1DnceQ4aG-5_Cs9QWENrY_ZP9L7MF6psgGwD";
-        const url = `https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/gviz/tq?`;
+        // Aapka CSV Link
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6wLoB92RkkkAwO_IC6Bx-8Si5lYfpMpdtRo_e_9RB1DnceQ4aG-5_Cs9QWENrY_ZP9L7MF6psgGwD/pub?output=csv";
 
         async function loadData() {
             try {
-                const res = await fetch(url);
-                const txt = await res.text();
-                const json = JSON.parse(txt.substring(47).slice(0, -2));
+                const res = await fetch(CSV_URL);
+                const data = await res.text();
                 
+                // CSV ko process karna
+                const rows = data.split('\n').slice(1); // Pehli line skip (header)
                 const list = document.getElementById('monthly-list');
                 list.innerHTML = '';
                 let totalBal = 0, totalExp = 0;
 
-                json.table.rows.forEach(row => {
-                    const month = row.c[0]?.v || "N/A";
-                    const bal = parseFloat(row.c[1]?.v) || 0;
-                    const exp = parseFloat(row.c[2]?.v) || 0;
-                    
-                    totalBal += bal;
-                    totalExp += exp;
+                rows.forEach(row => {
+                    const cols = row.split(','); // Comma se separate
+                    if (cols.length >= 3) {
+                        const month = cols[0];
+                        const bal = parseFloat(cols[1]) || 0;
+                        const exp = parseFloat(cols[2]) || 0;
+                        
+                        totalBal += bal;
+                        totalExp += exp;
 
-                    list.innerHTML += `
-                        <div class="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center border border-slate-100">
-                            <span class="font-bold text-slate-700">${month}</span>
-                            <div class="text-right">
-                                <p class="text-[10px] text-blue-600 font-bold">Bal: ${bal.toLocaleString()}</p>
-                                <p class="text-[10px] text-red-500 font-bold">Exp: ${exp.toLocaleString()}</p>
-                            </div>
-                        </div>`;
+                        list.innerHTML += `
+                            <div class="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center border border-slate-100">
+                                <span class="font-bold text-slate-700">${month}</span>
+                                <div class="text-right">
+                                    <p class="text-[10px] text-blue-600 font-bold">Bal: ${bal.toLocaleString()}</p>
+                                    <p class="text-[10px] text-red-500 font-bold">Exp: ${exp.toLocaleString()}</p>
+                                </div>
+                            </div>`;
+                    }
                 });
                 document.getElementById('total-balance').innerText = `Rs. ${totalBal.toLocaleString()}`;
                 document.getElementById('total-expenses').innerText = `Rs. ${totalExp.toLocaleString()}`;
             } catch(e) {
-                document.getElementById('monthly-list').innerHTML = "Data load nahi ho saka. Sheet link check karein.";
+                document.getElementById('monthly-list').innerHTML = "Error loading CSV data.";
             }
         }
         loadData();
