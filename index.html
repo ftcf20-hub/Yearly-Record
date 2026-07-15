@@ -1,20 +1,21 @@
 <script>
-    // Aapki Sheet ka Public URL (jo aapne diya tha)
-    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6wLoB92RkkkAwO_IC6Bx-8Si5lYfpMpdtRo_e_9RB1DnceQ4aG-5_Cs9QWENrY_ZP9L7MF6psgGwD/pub?output=csv";
+    // Proxy URL add kiya hai taake CORS error na aaye
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6wLoB92RkkkAwO_IC6Bx-8Si5lYfpMpdtRo_e_9RB1DnceQ4aG-5_Cs9QWENrY_ZP9L7MF6psgGwD/pub?output=csv";
+    const PROXY_URL = "https://api.allorigins.win/get?url=" + encodeURIComponent(SHEET_CSV_URL);
 
     async function loadData() {
         try {
-            const response = await fetch(SHEET_URL);
-            const data = await response.text();
+            const response = await fetch(PROXY_URL);
+            const json = await response.json();
+            const data = json.contents; // Yahan data mil raha hai
             
-            // CSV data ko rows mein split karna
             const rows = data.split('\n').filter(row => row.trim() !== "");
             const list = document.getElementById('monthly-list');
             list.innerHTML = '';
             
             let totalBal = 0, totalExp = 0;
 
-            // Pehli row (Headers) ko skip kar rahe hain
+            // Row 1 se shuru (Headers skip karne ke liye)
             for(let i = 1; i < rows.length; i++) {
                 const cols = rows[i].split(',');
                 if(cols.length >= 3) {
@@ -38,8 +39,8 @@
             document.getElementById('total-balance').innerText = `Rs. ${totalBal.toLocaleString()}`;
             document.getElementById('total-expenses').innerText = `Rs. ${totalExp.toLocaleString()}`;
         } catch(e) {
-            console.log("Error:", e);
-            document.getElementById('monthly-list').innerHTML = "Data fetch nahi ho saka. Connection check karein.";
+            console.error("Error Details:", e);
+            document.getElementById('monthly-list').innerHTML = "Data fetch nahi ho pa raha. Internet ya Sheet link check karein.";
         }
     }
     loadData();
