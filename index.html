@@ -25,13 +25,20 @@
         </div>
     </div>
 
+    <!-- Net Savings Section -->
+    <div class="px-4 mt-4">
+        <div class="bg-emerald-600 p-4 rounded-2xl shadow-lg text-white flex justify-between items-center">
+            <p class="text-xs font-bold uppercase opacity-90">Net Savings</p>
+            <h3 id="net-savings" class="text-xl font-bold">Rs. 0</h3>
+        </div>
+    </div>
+
     <div class="px-4 mt-8">
         <h2 class="text-lg font-bold text-slate-800 mb-4">Monthly Overview</h2>
         <div id="monthly-list" class="space-y-3"></div>
     </div>
 
     <script>
-        // CSV link ko direct load karne ki script
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6wLoB92RkkkAwO_IC6Bx-8Si5lYfpMpdtRo_e_9RB1DnceQ4aG-5_Cs9QWENrY_ZP9L7MF6psgGwD/pub?output=csv";
 
         fetch(CSV_URL)
@@ -45,7 +52,6 @@
                     const cols = rows[i].split(',');
                     if(cols[0]) {
                         const m = cols[0];
-                        // Comma hata kar number mein badalna
                         const b = parseFloat(cols[1].replace(/,/g, '')) || 0;
                         const e = parseFloat(cols[2].replace(/,/g, '')) || 0;
                         
@@ -61,8 +67,10 @@
                         </div>`;
                     }
                 }
+                const netSavings = totalB - totalE;
                 document.getElementById('total-balance').innerText = "Rs. " + totalB.toLocaleString();
                 document.getElementById('total-expenses').innerText = "Rs. " + totalE.toLocaleString();
+                document.getElementById('net-savings').innerText = "Rs. " + netSavings.toLocaleString();
             })
             .catch(() => {
                 document.getElementById('monthly-list').innerHTML = "<p class='text-center text-red-500'>Connection error. Internet check karein.</p>";
