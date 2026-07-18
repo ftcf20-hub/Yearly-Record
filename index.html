@@ -8,14 +8,14 @@
 </head>
 <body class="bg-slate-100 pb-10">
 
-    <div class="bg-blue-900 text-white p-6 rounded-b-[2.5rem] shadow-2xl text-center relative">
-        <!-- Ramzan Fund Icon (Adjusted positioning) -->
-        <div class="absolute top-4 left-4 z-20">
+    <div class="bg-emerald-900 text-white p-4 rounded-b-[2rem] shadow-2xl text-center relative">
+        <!-- Ramzan Fund Icon -->
+        <div class="absolute top-3 left-4 z-20">
             <button onclick="document.getElementById('ramzan-modal').classList.remove('hidden')" class="bg-white px-3 py-1 rounded-full shadow-lg text-emerald-600 font-bold text-[10px]">🌙 Ramzan</button>
         </div>
-        <h1 class="text-xl font-bold pt-6">Balance & Expenses Records</h1>
-        <p class="text-xs italic opacity-80">"Cash In And Cash Out Ledger"</p>
-        <div class="mt-4 bg-white/10 p-2 rounded-xl text-sm font-semibold tracking-widest">YEARLY REPORT 2026-27</div>
+        <h1 class="text-lg font-bold pt-6">Balance & Expenses Records</h1>
+        <p class="text-[10px] italic opacity-80">"Cash In And Cash Out Ledger"</p>
+        <div class="mt-2 bg-white/10 p-1.5 rounded-xl text-xs font-semibold tracking-widest">YEARLY REPORT 2026-27</div>
     </div>
 
     <!-- Modal -->
@@ -30,7 +30,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-2 gap-4 px-4 -mt-6">
+    <div class="grid grid-cols-2 gap-4 px-4 -mt-4">
         <div class="bg-white p-4 rounded-2xl shadow-lg border-b-4 border-blue-600">
             <p class="text-[9px] font-bold text-gray-400 uppercase">Total collected</p>
             <h3 id="total-balance" class="text-lg font-bold text-slate-800">0</h3>
@@ -93,7 +93,6 @@
                 if (netSavings < 0) document.getElementById('savings-box').className = "bg-red-600 p-4 rounded-2xl shadow-lg text-white flex justify-between items-center";
             });
 
-        // Fetch Ramzan Data and display as scrollable labeled cards
         fetch(RAMZAN_CSV_URL)
             .then(res => res.text())
             .then(data => {
