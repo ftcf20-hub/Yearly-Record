@@ -8,10 +8,24 @@
 </head>
 <body class="bg-slate-100 pb-10">
 
+    <!-- Ramzan Fund Icon (Top Left) -->
+    <div class="absolute top-6 left-4 z-20">
+        <button onclick="document.getElementById('ramzan-modal').classList.remove('hidden')" class="bg-white p-2 rounded-full shadow-lg text-emerald-600 font-bold text-xs">🌙 Ramzan</button>
+    </div>
+
     <div class="bg-blue-900 text-white p-6 rounded-b-[2.5rem] shadow-2xl text-center">
         <h1 class="text-xl font-bold">Balance & Expenses Records</h1>
         <p class="text-xs italic opacity-80">"Cash In And Cash Out Ledger"</p>
         <div class="mt-4 bg-white/10 p-2 rounded-xl text-sm font-semibold tracking-widest">YEARLY REPORT 2026-27</div>
+    </div>
+
+    <!-- Modal -->
+    <div id="ramzan-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h2 class="text-lg font-bold text-emerald-700 mb-4">Ramzan Fund Details</h2>
+            <div id="ramzan-content" class="text-sm space-y-2 text-slate-700">Loading...</div>
+            <button onclick="document.getElementById('ramzan-modal').classList.add('hidden')" class="mt-6 w-full bg-slate-800 text-white py-2 rounded-xl">Close</button>
+        </div>
     </div>
 
     <div class="grid grid-cols-2 gap-4 px-4 -mt-6">
@@ -25,7 +39,6 @@
         </div>
     </div>
 
-    <!-- Net Savings Section -->
     <div class="px-4 mt-4">
         <div id="savings-box" class="bg-emerald-600 p-4 rounded-2xl shadow-lg text-white flex justify-between items-center">
             <p class="text-xs font-bold uppercase opacity-90">Available Funds</p>
@@ -42,6 +55,7 @@
 
     <script>
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6wLoB92RkkkAwO_IC6Bx-8Si5lYfpMpdtRo_e_9RB1DnceQ4aG-5_Cs9QWENrY_ZP9L7MF6psgGwD/pub?output=csv";
+        const RAMZAN_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZ93s9o0iygZgHmzA0Z2JG7Wb_efFRi7AdifVoYjv3_nsNM_4OdvnUTyRzn9BdKskJzi43lCYDI4eW/pub?gid=0&single=true&output=csv";
 
         fetch(CSV_URL)
             .then(res => res.text())
@@ -51,25 +65,17 @@
                 let totalB = 0, totalE = 0;
                 let htmlContent = "";
 
-                // Regex to handle CSV values containing commas within quotes
-                const regex = /(".*?"|[^",\s]+)(?=\s*,|\s*$)/g;
-
                 for(let i = 1; i < rows.length; i++) {
                     const row = rows[i];
                     if(!row.trim()) continue;
-                    
                     const cols = row.split(',').map(c => c.replace(/"/g, ''));
-                    
                     if(cols[0]) {
-                        const m = cols[0];
                         const b = parseFloat(cols[1]?.replace(/,/g, '')) || 0;
                         const e = parseFloat(cols[2]?.replace(/,/g, '')) || 0;
-                        
                         totalB += b;
                         totalE += e;
-
                         htmlContent += `<div class="bg-white p-4 rounded-xl shadow-sm flex justify-between border">
-                            <span class="font-bold text-slate-700">${m}</span>
+                            <span class="font-bold text-slate-700">${cols[0]}</span>
                             <div class="text-right text-xs">
                                 <p class="text-blue-600 font-bold">Bal: ${b.toLocaleString()}</p>
                                 <p class="text-red-500 font-bold">Exp: ${e.toLocaleString()}</p>
@@ -77,28 +83,25 @@
                         </div>`;
                     }
                 }
-                
-                if (htmlContent === "") {
-                    list.innerHTML = "<p class='text-center text-slate-500 text-sm'>No data available.</p>";
-                } else {
-                    list.innerHTML = htmlContent;
-                }
-
+                list.innerHTML = htmlContent || "<p class='text-center'>No data.</p>";
                 const netSavings = totalB - totalE;
-                const savingsBox = document.getElementById('savings-box');
-                
                 document.getElementById('total-balance').innerText = "Rs. " + totalB.toLocaleString();
                 document.getElementById('total-expenses').innerText = "Rs. " + totalE.toLocaleString();
                 document.getElementById('net-savings').innerText = "Rs. " + netSavings.toLocaleString();
-                
-                // UI Improvement: Negative balance color alert
-                if (netSavings < 0) {
-                    savingsBox.classList.remove('bg-emerald-600');
-                    savingsBox.classList.add('bg-red-600');
+                if (netSavings < 0) document.getElementById('savings-box').className = "bg-red-600 p-4 rounded-2xl shadow-lg text-white flex justify-between items-center";
+            });
+
+        // Fetch Ramzan Data
+        fetch(RAMZAN_CSV_URL)
+            .then(res => res.text())
+            .then(data => {
+                const rows = data.split('\n');
+                let html = "";
+                for(let i = 1; i < rows.length; i++) {
+                    const cols = rows[i].split(',');
+                    if(cols[0]) html += `<p class="flex justify-between"><span>${cols[0]}</span> <b>${cols[1]}</b></p>`;
                 }
-            })
-            .catch(() => {
-                document.getElementById('monthly-list').innerHTML = "<p class='text-center text-red-500'>Connection error. Internet check karein.</p>";
+                document.getElementById('ramzan-content').innerHTML = html;
             });
     </script>
 </body>
