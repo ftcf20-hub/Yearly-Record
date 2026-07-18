@@ -30,14 +30,15 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-2 gap-4 px-4 -mt-4">
-        <div class="bg-white p-4 rounded-2xl shadow-lg border-b-4 border-blue-600">
-            <p class="text-[9px] font-bold text-gray-400 uppercase">Total collected</p>
+    <!-- Stats Section (Moved below the header, not overlapping) -->
+    <div class="grid grid-cols-2 gap-4 px-4 mt-6">
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-emerald-100">
+            <p class="text-[9px] font-bold text-emerald-600 uppercase">Total collected</p>
             <h3 id="total-balance" class="text-lg font-bold text-slate-800">0</h3>
         </div>
-        <div class="bg-white p-4 rounded-2xl shadow-lg border-b-4 border-red-500">
-            <p class="text-[9px] font-bold text-gray-400 uppercase">Total Expenses</p>
-            <h3 id="total-expenses" class="text-lg font-bold text-red-600">0</h3>
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-emerald-100">
+            <p class="text-[9px] font-bold text-emerald-600 uppercase">Total Expenses</p>
+            <h3 id="total-expenses" class="text-lg font-bold text-slate-800">0</h3>
         </div>
     </div>
 
@@ -57,7 +58,7 @@
 
     <script>
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6wLoB92RkkkAwO_IC6Bx-8Si5lYfpMpdtRo_e_9RB1DnceQ4aG-5_Cs9QWENrY_ZP9L7MF6psgGwD/pub?output=csv";
-        const RAMZAN_CSV_URL = "YOUR_RAMZAN_TAB_PUBLISHED_CSV_LINK_HERE";
+        const RAMZAN_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRZ93s9o0iygZgHmzA0Z2JG7Wb_efFRi7AdifVoYjv3_nsNM_4OdvnUTyRzn9BdKskJzi43lCYDI4eW/pub?gid=0&single=true&output=csv";
 
         fetch(CSV_URL)
             .then(res => res.text())
