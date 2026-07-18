@@ -93,7 +93,7 @@
                 if (netSavings < 0) document.getElementById('savings-box').className = "bg-red-600 p-4 rounded-2xl shadow-lg text-white flex justify-between items-center";
             });
 
-        // Fetch Ramzan Data and display as cards
+        // Fetch Ramzan Data and display as labeled cards
         fetch(RAMZAN_CSV_URL)
             .then(res => res.text())
             .then(data => {
@@ -102,10 +102,13 @@
                 for(let i = 1; i < rows.length; i++) {
                     const cols = rows[i].split(',');
                     if(cols[0]) {
+                        // Labeling logic: Adding color differentiation based on category name
+                        let color = cols[0].toLowerCase().includes('balance') ? 'text-blue-600' : 
+                                    cols[0].toLowerCase().includes('donate') ? 'text-red-600' : 'text-emerald-600';
                         html += `
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
                             <p class="text-[10px] text-slate-400 font-bold uppercase">${cols[0]}</p>
-                            <p class="text-md font-bold text-slate-800">${cols[1]}</p>
+                            <p class="text-md font-bold ${color}">${cols[1]}</p>
                         </div>`;
                     }
                 }
